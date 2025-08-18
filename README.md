@@ -3,8 +3,7 @@
 A sophisticated tech news aggregator with AI-powered summarization, intelligent keyword extraction, and beautiful user experience.
 
 ## Demo
-https://github.com/user-attachments/assets/6099bc9b-d0d2-47dd-a553-e520c1d03e7d
-
+https://github.com/user-attachments/assets/1bc1f793-2324-4e51-9b8f-eda8292d34b4
 
 ## 🚀 Features
 
