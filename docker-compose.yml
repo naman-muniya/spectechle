@@ -1,0 +1,104 @@
+services:
+  # Go Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DB_PATH=/app/data/spectechle.db
+      - NLP_SERVICE_URL=http://nlp:5000
+      - GIN_MODE=release
+    volumes:
+      - ./data:/app/data
+      - ./frontend:/app/frontend
+    depends_on:
+      - nlp
+    networks:
+      - spectechle-network
+    restart: unless-stopped
+
+  # Python NLP Service
+  nlp:
+    build:
+      context: ./nlp
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=false
+      - NLP_PORT=5000
+      - HF_HOME=/app/models
+      - TRANSFORMERS_CACHE=/app/models
+    volumes:
+      - ./nlp/models:/app/models
+      - ./data:/app/data
+    networks:
+      - spectechle-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+
+  # PostgreSQL Database (Optional - for production)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=spectechle
+      - POSTGRES_USER=spectechle
+      - POSTGRES_PASSWORD=spectechle_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - spectechle-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # Redis Cache (Optional - for production)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - spectechle-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # Nginx Reverse Proxy (Optional - for production)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+      - nlp
+    networks:
+      - spectechle-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  spectechle-network:
+    driver: bridge

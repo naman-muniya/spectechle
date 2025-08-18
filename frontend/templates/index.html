@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-search-plus"></i>
+                <h1>Spectechle</h1>
+            </div>
+            <p class="tagline">Smart Tech Search & Summarizer</p>
+        </header>
+
+        <!-- Search Section -->
+        <main class="main-content">
+            <div class="search-container">
+                <div class="search-box">
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Search for tech articles, research papers, or news..."
+                            class="search-input"
+                        >
+                        <button id="searchBtn" class="search-button">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search Options -->
+                <div class="search-options">
+                    <div class="mode-selector">
+                        <label class="mode-label">Search Mode:</label>
+                        <div class="mode-buttons">
+                            <button class="mode-btn active" data-mode="news">
+                                <i class="fas fa-newspaper"></i>
+                                News & Blogs
+                            </button>
+                            <button class="mode-btn" data-mode="research">
+                                <i class="fas fa-microscope"></i>
+                                Research Papers
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="category-filter">
+                        <label class="category-label">Categories:</label>
+                        <div class="category-chips">
+                            <span class="category-chip" data-category="ai">AI</span>
+                            <span class="category-chip" data-category="cloud">Cloud</span>
+                            <span class="category-chip" data-category="security">Security</span>
+                            <span class="category-chip" data-category="data">Data Science</span>
+                            <span class="category-chip" data-category="devops">DevOps</span>
+                            <span class="category-chip" data-category="web">Web Dev</span>
+                            <span class="category-chip" data-category="mobile">Mobile</span>
+                            <span class="category-chip" data-category="blockchain">Blockchain</span>
+                            <span class="category-chip" data-category="iot">IoT</span>
+                            <span class="category-chip" data-category="quantum">Quantum</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar Container - Right below search box -->
+            <div id="progressContainer" class="progress-container hidden">
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar">
+                        <div id="searchProgressBar" class="progress-fill"></div>
+                    </div>
+                    <div id="progressText" class="progress-text">Starting search...</div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state hidden">
+                <div class="loading-spinner"></div>
+                <p>Searching and collecting articles...</p>
+                
+                <div class="loading-steps">
+                    <div class="step">
+                        <i class="fas fa-spider"></i>
+                        <span>Scraping articles</span>
+                    </div>
+                    <div class="step">
+                        <i class="fas fa-database"></i>
+                        <span>Saving to database</span>
+                    </div>
+                    <div class="step">
+                        <i class="fas fa-check"></i>
+                        <span>Ready for analysis</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="results-section hidden">
+                <div class="results-header">
+                    <h2>Search Results</h2>
+                    <div class="results-stats">
+                        <span id="resultCount">0</span> articles found
+                    </div>
+                </div>
+
+                <div id="resultsContainer" class="results-container">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state hidden">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Oops! Something went wrong</h3>
+                <p id="errorMessage">An error occurred while searching. Please try again.</p>
+                <button id="retryBtn" class="retry-button">Try Again</button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Spectechle. Built with Go & Python for intelligent tech content search.</p>
+        </footer>
+    </div>
+
+    <!-- Article Loading Overlay -->
+    <div id="articleLoadingOverlay" class="article-loading-overlay hidden">
+        <div class="article-loading-content">
+            <div class="article-loading-spinner"></div>
+            <h3>Opening Article</h3>
+            <p>🤖 Loading article content...</p>
+        </div>
+    </div>
+
+    <!-- Article Modal -->
+    <div id="articleModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Article Title</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="article-meta">
+                    <span class="source" id="modalSource">Source</span>
+                    <span class="date" id="modalDate">Date</span>
+                    <span class="read-time" id="modalReadTime">5 min read</span>
+                </div>
+                <div class="article-categories" id="modalCategories">
+                    <!-- Categories will be populated here -->
+                </div>
+                <div class="article-summary">
+                    <h4>Summary</h4>
+                    <div id="modalSummaryContainer">
+                        <p id="modalSummary">Article summary will appear here...</p>
+                        <div id="modalSummaryLoading" class="summary-loading hidden">
+                            <div class="summary-spinner"></div>
+                            <p>🤖 AI is analyzing this article...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="article-keywords">
+                    <h4>Keywords</h4>
+                    <div class="keyword-tags" id="modalKeywords">
+                        <!-- Keywords will be populated here -->
+                    </div>
+                </div>
+                <div class="article-actions">
+                    <a id="modalUrl" href="#" target="_blank" class="read-full-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Read Full Article
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
